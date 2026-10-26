@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBL Trading Dashboard - منصة تحليل الذهب الاحترافية</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Cairo Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dbl: {
+                            dark: '#05070c',
+                            card: '#0c101c',
+                            cardBorder: '#1e293d',
+                            cyan: '#00f2fe',
+                            gold: '#ffb703',
+                            goldGlow: '#ffe600',
+                            emerald: '#10b981',
+                            rose: '#f43f5e'
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #04060a;
+            color: #f1f5f9;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(0, 242, 254, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(255, 183, 3, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        /* Modern Glassmorphism effect */
+        .glass-panel {
+            background: rgba(12, 16, 28, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-panel-gold {
+            background: rgba(18, 15, 8, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 183, 3, 0.25);
+            box-shadow: 0 0 20px rgba(255, 183, 3, 0.08);
+        }
+
+        .glass-panel-cyan {
+            background: rgba(6, 20, 30, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 242, 254, 0.25);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.08);
+        }
+
+        /* Neon Glow Effects */
+        .glow-cyan {
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+        }
+        .glow-gold {
+            box-shadow: 0 0 15px rgba(255, 183, 3, 0.3);
+        }
+        .glow-green {
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .text-glow-cyan {
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+        }
+        .text-glow-gold {
+            text-shadow: 0 0 10px rgba(255, 183, 3, 0.5);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #05070c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f2fe;
+        }
+
+        /* Pulse Animation for live elements */
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; filter: drop-shadow(0 0 8px rgba(0,242,254,0.6)); }
+            50% { opacity: 0.5; filter: drop-shadow(0 0 2px rgba(0,242,254,0.2)); }
+        }
+        .live-dot {
+            animation: pulse-glow 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-3 md:p-6 text-slate-100">
+
+    <!-- TOP HEADER / BRANDING -->
+    <header class="glass-panel rounded-3xl p-4 md:p-5 mb-5 flex flex-col lg:flex-row items-center justify-between gap-4 relative overflow-hidden">
+        <div class="absolute -right-10 -top-10 w-40 h-40 bg-dbl-cyan/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-dbl-gold/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- DBL Logo & Status -->
+        <div class="flex items-center gap-4 w-full lg:w-auto justify-between lg:justify-start">
+            <div class="flex items-center gap-3">
+                <div class="relative flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-dbl-cyan/40 glow-cyan">
+                    <span class="font-black text-2xl tracking-tighter bg-gradient-to-r from-dbl-cyan via-white to-dbl-gold bg-clip-text text-transparent">DBL</span>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-black text-xl tracking-wide text-white">DBL <span class="text-dbl-cyan font-bold text-sm">GOLD ANALYTICS</span></h1>
+                        <span class="text-[10px] bg-dbl-cyan/10 text-dbl-cyan border border-dbl-cyan/30 px-2 py-0.5 rounded-full font-bold">PRO v3.5</span>
+                    </div>
+                    <p class="text-xs text-slate-400">لوحة تحليل السيولة المتقدمة وتوقع المسارات الحية</p>
+                </div>
+            </div>
+
+            <!-- Mobile Live Status -->
+            <div class="lg:hidden flex items-center">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 live-dot"></span> صاعد قاطعي
+                </span>
+            </div>
+        </div>
+
+        <!-- Live Price Bar Top -->
+        <div class="flex flex-wrap items-center justify-center gap-3 w-full lg:w-auto">
+            <div class="bg-slate-950/80 px-4 py-2.5 rounded-2xl border border-slate-800 text-center min-w-[130px]">
+                <span class="text-[11px] text-slate-400 block mb-0.5">سعر الذهب الحين</span>
+                <span id="dbl-live-price" class="text-2xl font-black text-emerald-400 text-glow-cyan tracking-wider">4019.435</span>
+            </div>
+            
+            <div class="bg-slate-950/80 px-4 py-2.5 rounded-2xl border border-slate-800 text-center min-w-[110px]">
+                <span class="text-[11px] text-slate-400 block mb-0.5">التغير اليومي</span>
+                <span id="dbl-price-change" class="text-base font-extrabold text-emerald-400">+18.675 (+0.47%)</span>
+            </div>
+
+            <div class="bg-slate-950/80 px-4 py-2.5 rounded-2xl border border-slate-800 text-center min-w-[140px]">
+                <span class="text-[11px] text-slate-400 block mb-0.5">أقرب سيولة مستهدفة</span>
+                <span class="text-base font-extrabold text-dbl-gold text-glow-gold">4022.400 (+2.96)</span>
+            </div>
+        </div>
+
+        <!-- Actions & Mode -->
+        <div class="hidden lg:flex items-center gap-3">
+            <button id="sim-btn" onclick="toggleSimulation()" class="bg-gradient-to-r from-dbl-cyan/20 to-emerald-500/20 hover:from-dbl-cyan/30 hover:to-emerald-500/30 text-dbl-cyan border border-dbl-cyan/40 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 glow-cyan">
+                <i class="fa-solid fa-play" id="sim-icon"></i>
+                <span id="sim-text">تشغيل التحديث المباشر</span>
+            </button>
+            <div class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3.5 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 live-dot"></span> اتجاه صاعد قاطعي
+            </div>
+        </div>
+    </header>
+
+    <!-- BANNER: MARKET RADAR NOTICE -->
+    <div class="glass-panel-cyan rounded-2xl p-4 mb-5 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-dbl-cyan/20 text-dbl-cyan flex items-center justify-center shrink-0 text-lg border border-dbl-cyan/40">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h2 class="text-base font-bold text-white">تنبيه خوارزمية DBL Smart Money:</h2>
+                    <span class="bg-emerald-500/20 text-emerald-300 text-[11px] px-2 py-0.5 rounded-md font-bold">فرصة صاعدة مؤكدة</span>
+                </div>
+                <p class="text-xs text-slate-300 mt-0.5">السعر مستقر أعلى منطقة الدعم المحورية <span class="font-bold text-dbl-gold">4004.100</span>. نسبة الوصول لقمة لندن قبل الإغلاق اليومي بلغت <span class="font-bold text-emerald-400">92%</span>.</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+            <span class="text-xs text-slate-400"><i class="fa-regular fa-clock ml-1"></i> الإغلاق القادم: 15 دقيقة</span>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD GRID -->
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1 mb-5">
+        
+        <!-- RIGHT PANEL (In RTL this is First Visual Panel): TARGETS & LIQUIDITY (3 COLS) -->
+        <section class="lg:col-span-3 space-y-4">
+            
+            <!-- Target Liquidity Cards -->
+            <div class="glass-panel rounded-3xl p-4">
+                <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                    <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
+                        <i class="fa-solid fa-crosshairs text-dbl-gold"></i> مستويات السيولة المستهدفة
+                    </h3>
+                    <span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-md">فوق السعر</span>
+                </div>
+
+                <div class="space-y-3">
+                    <!-- Target 1 -->
+                    <div class="glass-panel-gold rounded-2xl p-3.5 relative overflow-hidden transition hover:scale-[1.02]">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-xs font-bold text-dbl-gold flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-dbl-gold"></span> قمة لندن (Liquidity)
+                            </span>
+                            <span class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-lg font-black">92%</span>
+                        </div>
+                        <div class="text-xl font-black text-white tracking-wider my-1">4022.400</div>
+                        <div class="flex justify-between items-center text-[11px] text-slate-400 pt-2 border-t border-slate-800/80">
+                            <span>الفرق: <strong class="text-emerald-400">+2.965 Pips</strong></span>
+                            <span>متوسط الحركة: 0.4x</span>
+                        </div>
+                    </div>
+
+                    <!-- Target 2 -->
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-3.5 relative overflow-hidden transition hover:scale-[1.02]">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-slate-400"></span> قمة أمس (Previous High)
+                            </span>
+                            <span class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-lg font-black">80%</span>
+                        </div>
+                        <div class="text-xl font-black text-slate-100 tracking-wider my-1">4034.020</div>
+                        <div class="flex justify-between items-center text-[11px] text-slate-400 pt-2 border-t border-slate-800/80">
+                            <span>الفرق: <strong class="text-emerald-400">+14.585 Pips</strong></span>
+                            <span>متوسط الحركة: 1.8x</span>
+                        </div>
+                    </div>
+
+                    <!-- Target 3 -->
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-3.5 relative overflow-hidden transition hover:scale-[1.02]">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-xs font-bold text-slate-400 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-slate-500"></span> قمة الأسبوع الماضي
+                            </span>
+                            <span class="text-xs bg-dbl-gold/20 text-dbl-gold border border-dbl-gold/30 px-2 py-0.5 rounded-lg font-black">45%</span>
+                        </div>
+                        <div class="text-xl font-black text-slate-300 tracking-wider my-1">4190.390</div>
+                        <div class="flex justify-between items-center text-[11px] text-slate-400 pt-2 border-t border-slate-800/80">
+                            <span>الفرق: <strong class="text-dbl-gold">+170.95 Pips</strong></span>
+                            <span>متوسط الحركة: 22.4x</span>
+                        </div>
+                    </div>
+
+                    <!-- Target 4 -->
+                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-3.5 relative overflow-hidden transition hover:scale-[1.02]">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-xs font-bold text-slate-400 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-slate-600"></span> قمة الشهر الماضي
+                            </span>
+                            <span class="text-xs bg-slate-800 text-slate-400 border border-slate-700 px-2 py-0.5 rounded-lg font-black">30%</span>
+                        </div>
+                        <div class="text-xl font-black text-slate-400 tracking-wider my-1">4510.920</div>
+                        <div class="flex justify-between items-center text-[11px] text-slate-400 pt-2 border-t border-slate-800/80">
+                            <span>الفرق: <strong class="text-slate-300">+491.48 Pips</strong></span>
+                            <span>متوسط الحركة: 64.5x</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk Management DBL Calculator -->
+            <div class="glass-panel rounded-3xl p-4 border border-slate-800">
+                <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+                    <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
+                        <i class="fa-solid fa-calculator text-dbl-cyan"></i> حاسبة مخاطر صفقات DBL
+                    </h3>
+                </div>
+
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <label class="text-slate-400 mb-1 block">رأس المال (USD):</label>
+                        <input type="number" id="calc-capital" value="10000" oninput="calculateDBLRisk()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-bold outline-none focus:border-dbl-cyan transition">
+                    </div>
+                    <div>
+                        <label class="text-slate-400 mb-1 block">نسبة المخاطرة (%):</label>
+                        <input type="number" id="calc-risk" value="1" step="0.5" oninput="calculateDBLRisk()" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-white font-bold outline-none focus:border-dbl-cyan transition">
+                    </div>
+                    <div class="bg-slate-950/90 p-3 rounded-2xl border border-slate-800/80 space-y-2 mt-2">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">حجم اللوت المقترح (Lot Size):</span>
+                            <span id="res-lot" class="font-black text-dbl-cyan text-sm">0.32 Lot</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">مبلغ المخاطرة المعادل:</span>
+                            <span id="res-risk-val" class="font-bold text-rose-400">$100.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">وقف الخسارة الآمن (Stop Loss):</span>
+                            <span id="res-sl" class="font-bold text-slate-200">4003.430</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CENTER PANEL: CHART & SCENARIO (6 COLS) -->
+        <section class="lg:col-span-6 glass-panel rounded-3xl p-4 flex flex-col justify-between relative border border-slate-800">
+            
+            <!-- Chart Controls Header -->
+            <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-3 flex-wrap gap-2">
+                <div class="flex items-center gap-2">
+                    <div class="w-2.5 h-2.5 rounded-full bg-dbl-cyan glow-cyan"></div>
+                    <h3 class="font-extrabold text-sm text-white">الشارت التفاعلي ومسارات DBL</h3>
+                    <span class="text-[10px] bg-slate-800/80 text-slate-400 px-2.5 py-0.5 rounded-full border border-slate-700">15-Min Candle</span>
+                </div>
+
+                <!-- Interactive Scenario Toggles -->
+                <div class="flex items-center gap-1.5 bg-slate-950 p-1 rounded-2xl border border-slate-800">
+                    <button onclick="switchChartPath('all')" id="btn-path-all" class="px-3 py-1 text-xs rounded-xl font-bold bg-dbl-cyan text-slate-950 transition">الكل</button>
+                    <button onclick="switchChartPath('bullish')" id="btn-path-bull" class="px-3 py-1 text-xs rounded-xl font-bold text-slate-400 hover:text-emerald-400 transition">مسار الشراء</button>
+                    <button onclick="switchChartPath('bearish')" id="btn-path-bear" class="px-3 py-1 text-xs rounded-xl font-bold text-slate-400 hover:text-rose-400 transition">مسار البيع</button>
+                </div>
+            </div>
+
+            <!-- Canvas Chart Holder -->
+            <div class="relative w-full h-[380px] md:h-[450px]">
+                <canvas id="dblChart"></canvas>
+            </div>
+
+            <!-- Chart Custom Legend -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-[11px] text-slate-400 border-t border-slate-800/80 pt-3 mt-2 text-center">
+                <div class="bg-slate-950/50 p-1.5 rounded-xl border border-slate-800 flex items-center justify-center gap-1.5">
+                    <span class="w-3 h-1 bg-emerald-400 rounded-full"></span> السعر والتوقع الصاعد
+                </div>
+                <div class="bg-slate-950/50 p-1.5 rounded-xl border border-slate-800 flex items-center justify-center gap-1.5">
+                    <span class="w-3 h-1 bg-rose-500 rounded-full"></span> المسار الهابط البديل
+                </div>
+                <div class="bg-slate-950/50 p-1.5 rounded-xl border border-slate-800 flex items-center justify-center gap-1.5">
+                    <span class="w-3 h-1 bg-dbl-gold rounded-full"></span> مستويات السيولة (القمم)
+                </div>
+                <div class="bg-slate-950/50 p-1.5 rounded-xl border border-slate-800 flex items-center justify-center gap-1.5">
+                    <span class="w-3 h-1 bg-slate-500 rounded-full"></span> مناطق الدعم الارتكازية
+                </div>
+            </div>
+        </section>
+
+        <!-- LEFT PANEL (In RTL this is Last Visual Panel): MARKET SENTIMENT & RADAR (3 COLS) -->
+        <section class="lg:col-span-3 space-y-4">
+            
+            <!-- Market Gauge & Power -->
+            <div class="glass-panel rounded-3xl p-4">
+                <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-3">
+                    <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
+                        <i class="fa-solid fa-gauge-high text-dbl-cyan"></i> رادار سلوك وقوة السوق
+                    </h3>
+                </div>
+
+                <!-- Bullish Power Progress Bar -->
+                <div class="space-y-3 mb-4">
+                    <div class="flex justify-between text-xs font-bold">
+                        <span class="text-slate-400">قوة الشراء الحالية (Bullish Power):</span>
+                        <span class="text-emerald-400 font-black">84%</span>
+                    </div>
+                    <div class="w-full h-3 bg-slate-950 rounded-full overflow-hidden p-0.5 border border-slate-800">
+                        <div class="h-full bg-gradient-to-r from-emerald-500 to-dbl-cyan rounded-full glow-green" style="width: 84%"></div>
+                    </div>
+                </div>
+
+                <!-- Market Frame Indicators -->
+                <div class="space-y-2.5 text-xs">
+                    <div class="flex justify-between items-center bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400">الاتجاه اليومي (Daily):</span>
+                        <span class="font-extrabold text-emerald-400 flex items-center gap-1">
+                            <i class="fa-solid fa-circle-up"></i> صاعد قوي
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between items-center bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400">الاتجاه الأسبوعي (Weekly):</span>
+                        <span class="font-extrabold text-emerald-400 flex items-center gap-1">
+                            <i class="fa-solid fa-circle-up"></i> صاعد
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between items-center bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400">افتتاح اليوم (Open):</span>
+                        <span class="font-bold text-dbl-gold">4000.760</span>
+                    </div>
+
+                    <div class="flex justify-between items-center bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400">أعلى سعر اليوم (High):</span>
+                        <span class="font-bold text-white">4020.100</span>
+                    </div>
+
+                    <div class="flex justify-between items-center bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400">أدنى سعر اليوم (Low):</span>
+                        <span class="font-bold text-slate-300">3992.870</span>
+                    </div>
+
+                    <div class="flex justify-between items-center bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400">نقطة الارتكاز (Pivot Point):</span>
+                        <span class="font-bold text-dbl-cyan">4004.100</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trade Signal Box -->
+            <div class="glass-panel-gold rounded-3xl p-4 text-center space-y-3 relative overflow-hidden">
+                <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-dbl-gold/10 rounded-full blur-xl"></div>
+                <span class="text-[11px] font-black bg-dbl-gold/20 text-dbl-gold px-3 py-1 rounded-full border border-dbl-gold/30">
+                    توصية استراتيجية DBL
+                </span>
+                <h4 class="text-lg font-black text-white mt-1">صفقة شراء ممتازة (BUY)</h4>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    يُنصح بالدخول من المستويات الحالية بهدف أول <strong class="text-dbl-gold">4022.400</strong> وهدف ثانٍ <strong class="text-dbl-gold">4034.020</strong> مع الحفاظ على وقف الخسارة أسفل <strong class="text-rose-400">4003.000</strong>.
+                </p>
+                <button onclick="openExecutionModal()" class="w-full bg-gradient-to-r from-dbl-gold to-amber-500 hover:from-amber-400 hover:to-dbl-gold text-slate-950 font-black py-3 rounded-2xl text-xs shadow-lg transition-all glow-gold">
+                    تأفيذ الصفقة في المحاكي
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="glass-panel rounded-2xl p-4 text-center text-xs text-slate-400 flex flex-col md:flex-row items-center justify-between gap-2">
+        <div>
+            <span class="font-bold text-white">DBL Trading Platform © 2026</span> - جميع الحقوق محفوظة لشبكة تحليلات DBL العالمية.
+        </div>
+        <div class="flex items-center gap-4 text-slate-400">
+            <span><i class="fa-solid fa-shield-halved text-emerald-400 ml-1"></i> حماية البيانات مباشرة</span>
+            <span><i class="fa-solid fa-server text-dbl-cyan ml-1"></i> الخوادم متصلة</span>
+        </div>
+    </footer>
+
+    <!-- EXECUTION MODAL SIMULATION -->
+    <div id="execution-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+        <div class="glass-panel-cyan rounded-3xl p-6 max-w-md w-full text-center shadow-2xl relative border border-dbl-cyan/40">
+            <button onclick="closeExecutionModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="w-14 h-14 bg-dbl-cyan/20 text-dbl-cyan rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl border border-dbl-cyan/40 glow-cyan">
+                <i class="fa-solid fa-paper-plane"></i>
+            </div>
+            <h3 class="text-xl font-black text-white mb-2">تأكيد أمر شراء الذهب (DBL Order)</h3>
+            <div class="bg-slate-950/80 p-4 rounded-2xl border border-slate-800 text-right space-y-2 mb-5 text-xs">
+                <div class="flex justify-between">
+                    <span class="text-slate-400">الأصل:</span>
+                    <span class="font-bold text-white">الذهب XAUUSD</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">سعر الدخول:</span>
+                    <span id="modal-entry-price" class="font-bold text-emerald-400">4019.435</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">حجم اللوت:</span>
+                    <span id="modal-lot" class="font-bold text-dbl-cyan">0.32 Lot</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">الهدف المستهدف:</span>
+                    <span class="font-bold text-dbl-gold">4022.400 (قمة لندن)</span>
+                </div>
+            </div>
+            <button onclick="confirmTradeExecution()" class="w-full bg-gradient-to-r from-emerald-500 to-dbl-cyan text-slate-950 font-black py-3 rounded-2xl text-sm transition hover:opacity-90 glow-green">
+                تأكيد الصفقة الآن
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        let livePrice = 4019.435;
+        let isSimulationRunning = false;
+        let simulationTimer = null;
+        let dblChartInstance = null;
+
+        // Initialize App on Window Load
+        window.onload = function() {
+            initDBLChart();
+            calculateDBLRisk();
+        };
+
+        // Initialize DBL Chart with Advanced Aesthetics
+        function initDBLChart() {
+            const ctx = document.getElementById('dblChart').getContext('2d');
+
+            // Chart Gradients
+            const cyanGradient = ctx.createLinearGradient(0, 0, 0, 300);
+            cyanGradient.addColorStop(0, 'rgba(0, 242, 254, 0.25)');
+            cyanGradient.addColorStop(1, 'rgba(0, 242, 254, 0.0)');
+
+            const labels = ['08:00', '08:30', '09:00', '09:15', '09:30', '09:45 (الان)', '10:00', '10:30', '11:00'];
+            
+            const mainPricePath = [4001.200, 3998.500, 4004.100, 4010.500, 4014.200, 4019.435, null, null, null];
+            const bullProjection = [null, null, null, null, null, 4019.435, 4022.400, 4030.000, 4034.020];
+            const bearProjection = [null, null, null, null, null, 4019.435, 4010.000, 4003.430, 3982.870];
+
+            dblChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'حركة السعر الحالية',
+                            data: mainPricePath,
+                            borderColor: '#00f2fe',
+                            backgroundColor: cyanGradient,
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.35,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#00f2fe',
+                            pointHoverRadius: 7
+                        },
+                        {
+                            label: 'المسار الصاعد المتوقع',
+                            data: bullProjection,
+                            borderColor: '#10b981',
+                            borderDash: [5, 5],
+                            borderWidth: 2.5,
+                            fill: false,
+                            tension: 0.35,
+                            pointRadius: 3
+                        },
+                        {
+                            label: 'المسار الهابط البديل',
+                            data: bearProjection,
+                            borderColor: '#f43f5e',
+                            borderDash: [4, 4],
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.35,
+                            pointRadius: 3
+                        },
+                        // Liquidity Lines
+                        {
+                            label: 'قمة أمس (4034.020)',
+                            data: Array(9).fill(4034.020),
+                            borderColor: '#ffb703',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            borderDash: [3, 3]
+                        },
+                        {
+                            label: 'قمة لندن (4022.400)',
+                            data: Array(9).fill(4022.400),
+                            borderColor: '#ffe600',
+                            borderWidth: 1.5,
+                            pointRadius: 0,
+                            borderDash: [2, 2]
+                        },
+                        {
+                            label: 'دعم الارتكاز (4003.430)',
+                            data: Array(9).fill(4003.430),
+                            borderColor: '#475569',
+                            borderWidth: 1,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: '#0c101c',
+                            titleColor: '#00f2fe',
+                            bodyColor: '#f1f5f9',
+                            borderColor: '#1e293d',
+                            borderWidth: 1,
+                            padding: 10,
+                            titleFont: { family: 'Cairo', weight: 'bold' },
+                            bodyFont: { family: 'Cairo' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#64748b', font: { family: 'Cairo' } }
+                        },
+                        y: {
+                            position: 'right',
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#64748b', font: { family: 'Cairo' } },
+                            min: 3975.000,
+                            max: 4045.000
+                        }
+                    }
+                }
+            });
+        }
+
+        // Toggle Live Price Simulation
+        function toggleSimulation() {
+            isSimulationRunning = !isSimulationRunning;
+            const simText = document.getElementById('sim-text');
+            const simIcon = document.getElementById('sim-icon');
+
+            if (isSimulationRunning) {
+                simText.innerText = "إيقاف التحديث اللحظي";
+                simIcon.className = "fa-solid fa-pause";
+                simulationTimer = setInterval(updateLivePriceTick, 1200);
+            } else {
+                simText.innerText = "تشغيل التحديث المباشر";
+                simIcon.className = "fa-solid fa-play";
+                clearInterval(simulationTimer);
+            }
+        }
+
+        // Simulating Real-time price fluctuations
+        function updateLivePriceTick() {
+            const randomDelta = (Math.random() - 0.44) * 0.95;
+            livePrice = parseFloat((livePrice + randomDelta).toFixed(3));
+
+            document.getElementById('dbl-live-price').innerText = livePrice.toFixed(3);
+            document.getElementById('modal-entry-price').innerText = livePrice.toFixed(3);
+
+            if (dblChartInstance) {
+                dblChartInstance.data.datasets[0].data[5] = livePrice;
+                dblChartInstance.update('none');
+            }
+        }
+
+        // Switch Chart View Paths
+        function switchChartPath(pathType) {
+            if (!dblChartInstance) return;
+
+            const btnAll = document.getElementById('btn-path-all');
+            const btnBull = document.getElementById('btn-path-bull');
+            const btnBear = document.getElementById('btn-path-bear');
+
+            // Reset buttons styling
+            [btnAll, btnBull, btnBear].forEach(btn => {
+                btn.className = "px-3 py-1 text-xs rounded-xl font-bold text-slate-400 hover:text-white transition";
+            });
+
+            if (pathType === 'all') {
+                dblChartInstance.data.datasets[1].hidden = false;
+                dblChartInstance.data.datasets[2].hidden = false;
+                btnAll.className = "px-3 py-1 text-xs rounded-xl font-bold bg-dbl-cyan text-slate-950 transition";
+            } else if (pathType === 'bullish') {
+                dblChartInstance.data.datasets[1].hidden = false;
+                dblChartInstance.data.datasets[2].hidden = true;
+                btnBull.className = "px-3 py-1 text-xs rounded-xl font-bold bg-emerald-500 text-slate-950 transition";
+            } else if (pathType === 'bearish') {
+                dblChartInstance.data.datasets[1].hidden = true;
+                dblChartInstance.data.datasets[2].hidden = false;
+                btnBear.className = "px-3 py-1 text-xs rounded-xl font-bold bg-rose-500 text-white transition";
+            }
+            dblChartInstance.update();
+        }
+
+        // DBL Risk Calculator Logic
+        function calculateDBLRisk() {
+            const capital = parseFloat(document.getElementById('calc-capital').value) || 10000;
+            const riskPct = parseFloat(document.getElementById('calc-risk').value) || 1;
+
+            const riskAmount = (capital * (riskPct / 100));
+            // Assuming 15 pips stop loss distance
+            const calculatedLot = (riskAmount / 300).toFixed(2);
+
+            document.getElementById('res-risk-val').innerText = '$' + riskAmount.toFixed(2);
+            document.getElementById('res-lot').innerText = calculatedLot + ' Lot';
+            document.getElementById('modal-lot').innerText = calculatedLot + ' Lot';
+        }
+
+        // Modal Handlers
+        function openExecutionModal() {
+            document.getElementById('execution-modal').classList.remove('hidden');
+            document.getElementById('execution-modal').classList.add('flex');
+        }
+
+        function closeExecutionModal() {
+            document.getElementById('execution-modal').classList.add('hidden');
+            document.getElementById('execution-modal').classList.remove('flex');
+        }
+
+        function confirmTradeExecution() {
+            closeExecutionModal();
+            alert('تم تنفيذ الأمر في المحاكي بنجاح بنسبة مخاطرة آمنة!');
+        }
+    </script>
+</body>
+</html>
